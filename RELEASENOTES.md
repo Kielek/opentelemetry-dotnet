@@ -4,6 +4,12 @@ This file contains highlights and announcements covering all components.
 For more details see `CHANGELOG.md` files maintained in the root source
 directory of each individual package.
 
+## 1.12.2001
+
+Release details: [1.12.2001](https://github.com/Kielek/opentelemetry-dotnet/releases/tag/core-1.12.2001)
+
+
+
 ## 1.12.0
 
 Release details: [1.12.0](https://github.com/open-telemetry/opentelemetry-dotnet/releases/tag/core-1.12.0)
