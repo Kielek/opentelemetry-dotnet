@@ -8,7 +8,13 @@ directory of each individual package.
 
 Release details: [1.12.2001](https://github.com/Kielek/opentelemetry-dotnet/releases/tag/core-1.12.2001)
 
-
+* **Breaking Change 2201 by evvar**: `OpenTelemetry.Exporter.OpenTelemetryProtocol` now
+  defaults to using OTLP/HTTP instead of OTLP/gRPC when targeting .NET Framework
+  and .NET Standard. This change may cause telemetry export to fail unless
+  appropriate adjustments are made. Explicitly setting OTLP/gRPC may result in a
+  `NotSupportedException` unless further configuration is applied. See
+  [#6209](https://github.com/open-telemetry/opentelemetry-dotnet/issues/6209) for
+  full details and mitigation guidance. [#6229](https://github.com/open-telemetry/opentelemetry-dotnet/pull/6229)
 
 ## 1.12.0
 
