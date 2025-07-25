@@ -7,6 +7,10 @@ Notes](../../RELEASENOTES.md).
 
 ## Unreleased
 
+## 1.12.1-alpha.4
+
+Released 2025-Jul-25
+
 * Fixed an issue in .NET Framework where OTLP export of traces, logs, and
   metrics using `OtlpExportProtocol.Grpc` did not correctly set the initial
   write position, resulting in gRPC protocol errors.
