@@ -197,6 +197,8 @@ jobs:
         token: ${{ secrets[needs.automation.outputs.token-secret-name] }}
 
     - name: Update release notes
+      env:
+        COMMENT_BODY: ${{ github.event.comment.body }}
       shell: pwsh
       run: |
         Import-Module .\build\scripts\prepare-release.psm1
@@ -206,6 +208,6 @@ jobs:
           -pullRequestNumber '${{ github.event.issue.number }}' `
           -botUserName '${{ needs.automation.outputs.username }}' `
           -commentUserName '${{ github.event.comment.user.login }}' `
-          -commentBody '${{ github.event.comment.body }}' `
+          -commentBody $Env:COMMENT_BODY `
           -gitUserName '${{ needs.automation.outputs.username }}' `
           -gitUserEmail '${{ needs.automation.outputs.email }}'
