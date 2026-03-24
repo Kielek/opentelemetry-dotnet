@@ -6,9 +6,13 @@ Notes](../../RELEASENOTES.md).
 
 ## Unreleased
 
-* Added `ObservedTimestamp` property to `LogRecord`.
-  ([#6979](https://github.com/open-telemetry/opentelemetry-dotnet/pull/6979))
+* Fixed `OverflowException` in `TraceIdRatioBasedSampler` when trace ID bytes
+produced `long.MinValue`.
+([[#6928](https://github.com/open-telemetry/opentelemetry-dotnet/issues/6928)])
 
+* Fixed precision issues when using `Histogram<float>` with custom
+  `HistogramBucketBoundaries`.
+  ([#6866](https://github.com/open-telemetry/opentelemetry-dotnet/issues/6866))
 * Fixed a thread-safety issue in `LogRecordSharedPool.Rent()`.
   ([#6833](https://github.com/open-telemetry/opentelemetry-dotnet/pull/6833)
 
@@ -16,6 +20,9 @@ Notes](../../RELEASENOTES.md).
   ObservableGauge) continuing to export stale data points after a callback
   stops reporting a series.
   ([#5950](https://github.com/open-telemetry/opentelemetry-dotnet/issues/5950))
+
+* Added `ObservedTimestamp` property to `LogRecord`.
+  ([#6979](https://github.com/open-telemetry/opentelemetry-dotnet/pull/6979))
 
 ## 1.15.0
 
