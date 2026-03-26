@@ -208,7 +208,7 @@ internal static class Generators
             var logRecord = LogRecordSharedPool.Current.Rent();
 
             logRecord.Severity = severity ?? LogRecordSeverities.Sample(size, 1).First();
-            logRecord.Timestamp = DateTime.UtcNow;
+            logRecord.TimestampUtc = DateTime.UtcNow;
 
             // Add attributes
             var count = Math.Min(size, 50);

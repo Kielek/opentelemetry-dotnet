@@ -47,7 +47,15 @@ public class ConsoleLogRecordExporter : ConsoleExporter<LogRecord>
 
         foreach (var logRecord in batch)
         {
-            this.WriteLine($"{"LogRecord.Timestamp:",-RightPaddingLength}{logRecord.Timestamp:yyyy-MM-ddTHH:mm:ss.fffffffZ}");
+            if (logRecord.TimestampUtc.HasValue)
+            {
+                this.WriteLine($"{"LogRecord.Timestamp:",-RightPaddingLength}{logRecord.TimestampUtc.Value:yyyy-MM-ddTHH:mm:ss.fffffffZ}");
+            }
+
+            if (logRecord.ObservedTimestamp.HasValue)
+            {
+                this.WriteLine($"{"LogRecord.ObservedTimestamp:",-RightPaddingLength}{logRecord.ObservedTimestamp.Value:yyyy-MM-ddTHH:mm:ss.fffffffZ}");
+            }
 
             if (logRecord.TraceId != default)
             {

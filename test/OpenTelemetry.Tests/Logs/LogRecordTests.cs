@@ -1098,13 +1098,14 @@ public sealed class LogRecordTests
         var record = exportedItems[0];
 
         // ObservedTimestamp is set by the SDK to when the log was captured.
-        Assert.InRange(record.ObservedTimestamp, before, after);
-        Assert.Equal(DateTimeKind.Utc, record.ObservedTimestamp.Kind);
+        Assert.NotNull(record.ObservedTimestamp);
+        Assert.InRange(record.ObservedTimestamp.Value, before, after);
+        Assert.Equal(DateTimeKind.Utc, record.ObservedTimestamp.Value.Kind);
 
         // Verify the setter converts local time to UTC.
         var localNow = DateTime.Now;
         record.ObservedTimestamp = localNow;
-        Assert.Equal(DateTimeKind.Utc, record.ObservedTimestamp.Kind);
+        Assert.Equal(DateTimeKind.Utc, record.ObservedTimestamp!.Value.Kind);
         Assert.Equal(localNow.ToUniversalTime(), record.ObservedTimestamp);
     }
 

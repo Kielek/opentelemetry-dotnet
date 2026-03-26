@@ -179,9 +179,13 @@ internal static class ProtobufOtlpLogSerializer
         var logRecordLengthPosition = otlpTagWriterState.WritePosition;
         otlpTagWriterState.WritePosition += ReserveSizeForLength;
 
-        var timestamp = (ulong)logRecord.Timestamp.ToUnixTimeNanoseconds();
-        var observedTimestamp = logRecord.ObservedTimestamp == logRecord.Timestamp ? timestamp
-            : (ulong)logRecord.ObservedTimestamp.ToUnixTimeNanoseconds();
+        var timestamp = logRecord.TimestampUtc.HasValue
+            ? (ulong)logRecord.TimestampUtc.Value.ToUnixTimeNanoseconds()
+            : 0UL;
+        var observedTimestamp = logRecord.ObservedTimestamp.HasValue
+            ? (logRecord.ObservedTimestamp == logRecord.TimestampUtc ? timestamp
+                : (ulong)logRecord.ObservedTimestamp.Value.ToUnixTimeNanoseconds())
+            : 0UL;
         otlpTagWriterState.WritePosition = ProtobufSerializer.WriteFixed64WithTag(otlpTagWriterState.Buffer, otlpTagWriterState.WritePosition, ProtobufOtlpLogFieldNumberConstants.LogRecord_Time_Unix_Nano, timestamp);
         otlpTagWriterState.WritePosition = ProtobufSerializer.WriteFixed64WithTag(otlpTagWriterState.Buffer, otlpTagWriterState.WritePosition, ProtobufOtlpLogFieldNumberConstants.LogRecord_Observed_Time_Unix_Nano, observedTimestamp);
 

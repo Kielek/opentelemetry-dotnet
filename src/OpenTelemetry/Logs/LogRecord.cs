@@ -109,7 +109,22 @@ public sealed class LogRecord
     /// cref="DateTimeKind.Local"/> it will be automatically converted to
     /// UTC using <see cref="DateTime.ToUniversalTime"/>.
     /// </remarks>
+    [Obsolete("Use TimestampUtc instead. This property will be removed in a future major version.")]
     public DateTime Timestamp
+    {
+        get => this.Data.Timestamp ?? this.Data.ObservedTimestamp ?? default(DateTime);
+        set => this.Data.Timestamp = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the log timestamp.
+    /// </summary>
+    /// <remarks>
+    /// Note: If <see cref="TimestampUtc"/> is set to a value with <see
+    /// cref="DateTimeKind.Local"/> it will be automatically converted to
+    /// UTC using <see cref="DateTime.ToUniversalTime"/>.
+    /// </remarks>
+    public DateTime? TimestampUtc
     {
         get => this.Data.Timestamp;
         set => this.Data.Timestamp = value;
@@ -123,7 +138,7 @@ public sealed class LogRecord
     /// cref="DateTimeKind.Local"/> it will be automatically converted to
     /// UTC using <see cref="DateTime.ToUniversalTime"/>.
     /// </remarks>
-    public DateTime ObservedTimestamp
+    public DateTime? ObservedTimestamp
     {
         get => this.Data.ObservedTimestamp;
         set => this.Data.ObservedTimestamp = value;

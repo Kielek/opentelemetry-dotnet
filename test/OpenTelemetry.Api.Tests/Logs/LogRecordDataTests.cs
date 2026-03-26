@@ -86,19 +86,17 @@ public sealed class LogRecordDataTests
     [Fact]
     public void TimestampTest()
     {
-        var nowUtc = DateTime.UtcNow;
-
         var record = new LogRecordData();
-        Assert.True(record.Timestamp >= nowUtc);
+        Assert.Null(record.Timestamp);
 
         record = default;
-        Assert.Equal(DateTime.MinValue, record.Timestamp);
+        Assert.Null(record.Timestamp);
 
         var now = DateTime.Now;
 
         record.Timestamp = now;
 
-        Assert.Equal(DateTimeKind.Utc, record.Timestamp.Kind);
+        Assert.Equal(DateTimeKind.Utc, record.Timestamp!.Value.Kind);
         Assert.Equal(now.ToUniversalTime(), record.Timestamp);
     }
 
@@ -111,13 +109,13 @@ public sealed class LogRecordDataTests
         Assert.True(record.ObservedTimestamp >= nowUtc);
 
         record = default;
-        Assert.Equal(DateTime.MinValue, record.ObservedTimestamp);
+        Assert.Null(record.ObservedTimestamp);
 
         var now = DateTime.Now;
 
         record.ObservedTimestamp = now;
 
-        Assert.Equal(DateTimeKind.Utc, record.ObservedTimestamp.Kind);
+        Assert.Equal(DateTimeKind.Utc, record.ObservedTimestamp!.Value.Kind);
         Assert.Equal(now.ToUniversalTime(), record.ObservedTimestamp);
     }
 

@@ -26,9 +26,9 @@ internal
     struct LogRecordData
 #pragma warning restore CA1815 // Override equals and operator equals on value types
 {
-    internal DateTime TimestampBacking = DateTime.UtcNow;
+    internal DateTime? TimestampBacking;
 
-    internal DateTime ObservedTimestampBacking = DateTime.UtcNow;
+    internal DateTime? ObservedTimestampBacking = DateTime.UtcNow;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LogRecordData"/> struct.
@@ -36,7 +36,7 @@ internal
     /// <remarks>
     /// Notes:
     /// <list type="bullet">
-    /// <item>The <see cref="Timestamp"/> and <see cref="ObservedTimestamp"/> properties are initialized to <see
+    /// <item>The <see cref="ObservedTimestamp"/> property is initialized to <see
     /// cref="DateTime.UtcNow"/> automatically.</item>
     /// <item>The <see cref="TraceId"/>, <see cref="SpanId"/>, and <see
     /// cref="TraceFlags"/> properties will be set using the <see
@@ -52,7 +52,7 @@ internal
     /// Initializes a new instance of the <see cref="LogRecordData"/> struct.
     /// </summary>
     /// <remarks>
-    /// Note: <see cref="Timestamp"/> and <see cref="ObservedTimestamp"/> properties are initialized to <see
+    /// Note: <see cref="ObservedTimestamp"/> property is initialized to <see
     /// cref="DateTime.UtcNow"/> automatically.
     /// </remarks>
     /// <param name="activity">Optional <see cref="Activity"/> used to populate
@@ -67,7 +67,7 @@ internal
     /// Initializes a new instance of the <see cref="LogRecordData"/> struct.
     /// </summary>
     /// <remarks>
-    /// Note: <see cref="Timestamp"/> and <see cref="ObservedTimestamp"/> properties are initialized to <see
+    /// Note: <see cref="ObservedTimestamp"/> property is initialized to <see
     /// cref="DateTime.UtcNow"/> automatically.
     /// </remarks>
     /// <param name="activityContext"><see cref="ActivityContext"/> used to
@@ -88,10 +88,10 @@ internal
     /// cref="DateTimeKind.Local"/> it will be automatically converted to
     /// UTC using <see cref="DateTime.ToUniversalTime"/>.
     /// </remarks>
-    public DateTime Timestamp
+    public DateTime? Timestamp
     {
         readonly get => this.TimestampBacking;
-        set => this.TimestampBacking = value.Kind == DateTimeKind.Local ? value.ToUniversalTime() : value;
+        set => this.TimestampBacking = value is { Kind: DateTimeKind.Local } v ? v.ToUniversalTime() : value;
     }
 
     /// <summary>
@@ -102,10 +102,10 @@ internal
     /// cref="DateTimeKind.Local"/> it will be automatically converted to
     /// UTC using <see cref="DateTime.ToUniversalTime"/>.
     /// </remarks>
-    public DateTime ObservedTimestamp
+    public DateTime? ObservedTimestamp
     {
         readonly get => this.ObservedTimestampBacking;
-        set { this.ObservedTimestampBacking = value.Kind == DateTimeKind.Local ? value.ToUniversalTime() : value; }
+        set => this.ObservedTimestampBacking = value is { Kind: DateTimeKind.Local } v ? v.ToUniversalTime() : value;
     }
 
     /// <summary>
