@@ -98,7 +98,7 @@ internal sealed class PrometheusHttpListener : IDisposable
     /// </summary>
     public void Stop()
     {
-        CancellationTokenSource? tokenSource;
+        CancellationTokenSource tokenSource;
         Task? workerThread;
 
         lock (this.syncObject)
@@ -111,8 +111,6 @@ internal sealed class PrometheusHttpListener : IDisposable
                 return;
             }
 
-            this.tokenSource = null;
-            this.workerThread = null;
         }
 
         try
@@ -123,6 +121,15 @@ internal sealed class PrometheusHttpListener : IDisposable
         finally
         {
             tokenSource.Dispose();
+
+            lock (this.syncObject)
+            {
+                if (ReferenceEquals(this.tokenSource, tokenSource))
+                {
+                    this.tokenSource = null;
+                    this.workerThread = null;
+                }
+            }
         }
     }
 
