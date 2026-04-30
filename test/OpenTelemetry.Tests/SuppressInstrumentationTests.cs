@@ -72,6 +72,27 @@ public class SuppressInstrumentationTests
     }
 
     [Fact]
+    public async Task SuppressInstrumentationReferenceCountDoesNotLeakAcrossAsyncFlow()
+    {
+        Assert.False(Sdk.SuppressInstrumentation);
+        Assert.Equal(1, SuppressInstrumentationScope.Enter());
+
+        await Task.Factory.StartNew(
+            () =>
+            {
+                Assert.True(Sdk.SuppressInstrumentation);
+                Assert.Equal(2, SuppressInstrumentationScope.IncrementIfTriggered());
+                Assert.Equal(1, SuppressInstrumentationScope.DecrementIfTriggered());
+            },
+            CancellationToken.None,
+            TaskCreationOptions.None,
+            TaskScheduler.Default);
+
+        Assert.Equal(0, SuppressInstrumentationScope.DecrementIfTriggered());
+        Assert.False(Sdk.SuppressInstrumentation);
+    }
+
+    [Fact]
     public void DecrementIfTriggeredOnlyWorksInReferenceCountingMode()
     {
         // Instrumentation is not suppressed, DecrementIfTriggered is a no op
