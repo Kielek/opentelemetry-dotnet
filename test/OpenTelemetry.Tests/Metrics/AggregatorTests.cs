@@ -510,6 +510,94 @@ public class AggregatorTests
         }
     }
 
+    [Theory]
+    [InlineData(AggregationType.Base2ExponentialHistogram, AggregationTemporality.Cumulative, double.NaN)]
+    [InlineData(AggregationType.Base2ExponentialHistogram, AggregationTemporality.Cumulative, double.PositiveInfinity)]
+    [InlineData(AggregationType.Base2ExponentialHistogram, AggregationTemporality.Cumulative, double.NegativeInfinity)]
+    [InlineData(AggregationType.Base2ExponentialHistogram, AggregationTemporality.Delta, double.NaN)]
+    [InlineData(AggregationType.Base2ExponentialHistogram, AggregationTemporality.Delta, double.PositiveInfinity)]
+    [InlineData(AggregationType.Base2ExponentialHistogram, AggregationTemporality.Delta, double.NegativeInfinity)]
+    [InlineData(AggregationType.Base2ExponentialHistogramWithMinMax, AggregationTemporality.Cumulative, double.NaN)]
+    [InlineData(AggregationType.Base2ExponentialHistogramWithMinMax, AggregationTemporality.Cumulative, double.PositiveInfinity)]
+    [InlineData(AggregationType.Base2ExponentialHistogramWithMinMax, AggregationTemporality.Cumulative, double.NegativeInfinity)]
+    [InlineData(AggregationType.Base2ExponentialHistogramWithMinMax, AggregationTemporality.Delta, double.NaN)]
+    [InlineData(AggregationType.Base2ExponentialHistogramWithMinMax, AggregationTemporality.Delta, double.PositiveInfinity)]
+    [InlineData(AggregationType.Base2ExponentialHistogramWithMinMax, AggregationTemporality.Delta, double.NegativeInfinity)]
+    internal void ExponentialHistogramIgnoresNonFiniteMeasurements(
+        AggregationType aggregationType,
+        AggregationTemporality aggregationTemporality,
+        double nonFiniteMeasurement)
+    {
+        var streamConfiguration = new Base2ExponentialBucketHistogramConfiguration();
+        var metricStreamIdentity = new MetricStreamIdentity(Instrument, streamConfiguration);
+        var aggregatorStore = new AggregatorStore(
+            metricStreamIdentity,
+            aggregationType,
+            aggregationTemporality,
+            cardinalityLimit: 1024);
+        var expectedHistogram = new Base2ExponentialBucketHistogram();
+
+        aggregatorStore.Update(0D, []);
+        aggregatorStore.Update(100D, []);
+        aggregatorStore.Update(nonFiniteMeasurement, []);
+        aggregatorStore.Update(200D, []);
+        expectedHistogram.Record(0D);
+        expectedHistogram.Record(100D);
+        expectedHistogram.Record(200D);
+
+        AssertSnapshot(expectedCount: 3, expectedSum: 300, expectedMin: 0, expectedMax: 200);
+
+        // A rejected measurement must not produce a delta point by itself.
+        aggregatorStore.Update(nonFiniteMeasurement, []);
+        Assert.Equal(aggregationTemporality == AggregationTemporality.Delta ? 0 : 1, aggregatorStore.Snapshot());
+
+        aggregatorStore.Update(300D, []);
+        if (aggregationTemporality == AggregationTemporality.Delta)
+        {
+            expectedHistogram.Reset(isMinMax: false);
+        }
+
+        expectedHistogram.Record(300D);
+        var outputDelta = aggregationTemporality == AggregationTemporality.Delta;
+        AssertSnapshot(outputDelta ? 1 : 4, outputDelta ? 300 : 600, outputDelta ? 300 : 0, expectedMax: 300);
+
+        void AssertSnapshot(long expectedCount, double expectedSum, double expectedMin, double expectedMax)
+        {
+            aggregatorStore.Snapshot();
+            var metricPoints = new List<MetricPoint>();
+            foreach (ref readonly var metricPoint in aggregatorStore.GetMetricPoints())
+            {
+                metricPoints.Add(metricPoint);
+            }
+
+            var point = Assert.Single(metricPoints);
+            var data = point.GetExponentialHistogramData();
+            AssertExponentialBucketsAreCorrect(expectedHistogram, data);
+            Assert.Equal(expectedCount, point.GetHistogramCount());
+            Assert.Equal(expectedSum, point.GetHistogramSum());
+
+            var bucketCount = data.ZeroCount;
+            foreach (var count in data.PositiveBuckets)
+            {
+                bucketCount += count;
+            }
+
+            foreach (var count in data.NegativeBuckets)
+            {
+                bucketCount += count;
+            }
+
+            Assert.Equal(point.GetHistogramCount(), bucketCount);
+            var hasMinMax = point.TryGetHistogramMinMaxValues(out var min, out var max);
+            Assert.Equal(aggregationType == AggregationType.Base2ExponentialHistogramWithMinMax, hasMinMax);
+            if (hasMinMax)
+            {
+                Assert.Equal(expectedMin, min);
+                Assert.Equal(expectedMax, max);
+            }
+        }
+    }
+
     [Fact]
     internal void ExponentialHistogramDeltaSnapshotResetsBucketState()
     {
