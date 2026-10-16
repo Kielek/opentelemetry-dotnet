@@ -1057,7 +1057,7 @@ public struct MetricPoint
 
     private void UpdateBase2ExponentialHistogram(double number, ReadOnlySpan<KeyValuePair<string, object?>> tags = default, bool offerExemplar = false)
     {
-        if (number < 0)
+        if (number < 0 || !double.IsFinite(number))
         {
             this.CompleteUpdateWithoutMeasurement();
             return;
@@ -1086,7 +1086,7 @@ public struct MetricPoint
 
     private void UpdateBase2ExponentialHistogramWithMinMax(double number, ReadOnlySpan<KeyValuePair<string, object?>> tags = default, bool offerExemplar = false)
     {
-        if (number < 0)
+        if (number < 0 || !double.IsFinite(number))
         {
             this.CompleteUpdateWithoutMeasurement();
             return;
